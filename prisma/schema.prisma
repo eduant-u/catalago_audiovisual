@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Papel {
+  USER
+  ADMIN
+}
+
+model Usuario {
+  id         Int         @id @default(autoincrement())
+  nome       String
+  email      String      @unique
+  senha      String
+  papel      Papel       @default(USER)
+  avaliacoes Avaliacao[]
+}
+
+model Obra {
+  id         Int         @id @default(autoincrement())
+  titulo     String
+  descricao  String?
+  ano        Int?
+  avaliacoes Avaliacao[]
+}
+
+model Avaliacao {
+  id         Int      @id @default(autoincrement())
+  nota       Int
+  comentario String?
+  data       DateTime @default(now())
+
+  usuarioId Int
+  obraId    Int
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+  obra    Obra    @relation(fields: [obraId], references: [id])
+}
