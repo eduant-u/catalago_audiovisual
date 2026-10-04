@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import prisma from "../lib/prisma.js";
+import jwt from "jsonwebtoken";
 
 export async function cadastrar(dados) {
   const { nome, email, senha } = dados;
@@ -31,4 +32,39 @@ export async function cadastrar(dados) {
   });
 
   return usuario;
+}
+
+export async function entrar(dados) {
+  const { email, senha } = dados;
+
+  const usuario = await prisma.usuario.findUnique({
+    where: { email },
+  });
+
+  if (!usuario) {
+    const erro = new Error("Email ou senha inválidos");
+    erro.status = 401;
+    throw erro;
+  }
+
+  const senhaValida = await bcrypt.compare(senha, usuario.senha);
+
+  if (!senhaValida) {
+    const erro = new Error("Email ou senha inválidos");
+    erro.status = 401;
+    throw erro;
+  }
+
+  const token = jwt.sign(
+    {
+      id: usuario.id,
+      papel: usuario.papel,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "1h",
+    }
+  );
+
+  return { token };
 }
