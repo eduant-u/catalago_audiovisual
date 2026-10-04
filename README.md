@@ -1,6 +1,6 @@
 # Catálogo Audiovisual — API
 
-Este projeto é uma API em **Node.js + Express**. Ela usa **SQLite** como banco de dados, **Prisma** para acessar as tabelas e **JWT** para identificar quem está logado.
+Este projeto é uma API em **Node.js + Express**. Ela usa **SQLite** como banco de dados e **Prisma ORM** para modelar e acessar os dados. O **JWT** identifica quem está logado.
 
 Por enquanto, dá para cadastrar usuários, fazer login e acessar rotas protegidas. As tabelas de **obras** e **avaliações** já estão definidas no Prisma, mas ainda não existem rotas para criar ou consultar esses dados.
 
@@ -105,7 +105,7 @@ Resposta esperada: `200 OK`, com o `id` e o `papel` do usuário. Sem token ou co
 
 **GET** `http://localhost:3001/auth/admin`
 
-Use o mesmo header `Authorization` do passo anterior. Um usuário recém-cadastrado tem papel `USER`, então a resposta esperada é `403 Forbidden`. Para testar o sucesso dessa rota no banco local, rode `npx prisma studio`, abra a tabela **Usuario**, mude o campo `papel` desse usuário para `ADMIN`, salve e **faça login novamente** para receber um token com o novo papel. Aí a rota retorna `200 OK`.
+Use o mesmo header `Authorization` do passo anterior. Um usuário recém-cadastrado tem papel `USER`, então a resposta esperada é `403 Forbidden`. Para testar a rota com um administrador, altere o campo `papel` de um usuário para `ADMIN` diretamente no banco local. Depois, **faça login novamente** para gerar um token com o papel atualizado. Com esse token, a rota retorna `200 OK`.
 
 ## Resumo das rotas atuais
 
