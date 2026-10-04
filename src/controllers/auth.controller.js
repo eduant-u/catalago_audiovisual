@@ -19,3 +19,9 @@ export async function login(req, res, next) {
     next(erro);
   }
 }
+
+export function me(req, res) {
+  return res.status(200).json({
+    usuario: req.usuario,
+  });
+}
