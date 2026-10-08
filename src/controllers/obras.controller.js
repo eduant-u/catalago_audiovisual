@@ -1,64 +1,87 @@
 import * as obrasService from "../services/obras.service.js";
 
-function lerId(req, res) {
+function lerId(req) {
   const id = Number(req.params.id);
 
   if (!Number.isInteger(id)) {
-    res.status(400).json({ erro: "ID inválido" });
-    return null;
+    const erro = new Error("ID inválido");
+    erro.status = 400;
+    throw erro;
   }
 
   return id;
 }
 
-export async function listar(req, res) {
-  res.json(await obrasService.listarObras());
-}
+export async function listar(req, res, next) {
+  try {
+    const obras = await obrasService.listarObras();
 
-export async function buscar(req, res) {
-  const id = lerId(req, res);
-
-  if (id === null) return;
-
-  const obra = await obrasService.buscarObra(id);
-
-  if (!obra) {
-    return res.status(404).json({ erro: "Obra não encontrada" });
+    return res.json(obras);
+  } catch (erro) {
+    next(erro);
   }
-
-  res.json(obra);
 }
 
-export async function criar(req, res) {
-  const obra = await obrasService.criarObra(req.body);
+export async function buscar(req, res, next) {
+  try {
+    const id = lerId(req);
 
-  res.status(201).json(obra);
-}
+    const obra = await obrasService.buscarObra(id);
 
-export async function atualizar(req, res) {
-  const id = lerId(req, res);
+    if (!obra) {
+      const erro = new Error("Obra não encontrada");
+      erro.status = 404;
+      throw erro;
+    }
 
-  if (id === null) return;
-
-  const obra = await obrasService.atualizarObra(id, req.body);
-
-  if (!obra) {
-    return res.status(404).json({ erro: "Obra não encontrada" });
+    return res.json(obra);
+  } catch (erro) {
+    next(erro);
   }
-
-  res.json(obra);
 }
 
-export async function remover(req, res) {
-  const id = lerId(req, res);
+export async function criar(req, res, next) {
+  try {
+    const obra = await obrasService.criarObra(req.body);
 
-  if (id === null) return;
-
-  const removida = await obrasService.removerObra(id);
-
-  if (!removida) {
-    return res.status(404).json({ erro: "Obra não encontrada" });
+    return res.status(201).json(obra);
+  } catch (erro) {
+    next(erro);
   }
+}
 
-  res.status(204).send();
+export async function atualizar(req, res, next) {
+  try {
+    const id = lerId(req);
+
+    const obra = await obrasService.atualizarObra(id, req.body);
+
+    if (!obra) {
+      const erro = new Error("Obra não encontrada");
+      erro.status = 404;
+      throw erro;
+    }
+
+    return res.json(obra);
+  } catch (erro) {
+    next(erro);
+  }
+}
+
+export async function remover(req, res, next) {
+  try {
+    const id = lerId(req);
+
+    const removida = await obrasService.removerObra(id);
+
+    if (!removida) {
+      const erro = new Error("Obra não encontrada");
+      erro.status = 404;
+      throw erro;
+    }
+
+    return res.status(204).send();
+  } catch (erro) {
+    next(erro);
+  }
 }
